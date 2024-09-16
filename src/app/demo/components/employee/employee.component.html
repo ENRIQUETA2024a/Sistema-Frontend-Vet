@@ -1,0 +1,164 @@
+<p-toast key="tst"></p-toast>
+<div class="grid">
+	<div class="col-12">
+		<div class="card">
+            <p-panel [collapsed]="false" class="line-height-3 m-0">
+                <ng-template pTemplate="header">
+                    <div class="text-2xl font-bold">Empleados</div>
+                </ng-template>
+                <ng-template pTemplate="icons">
+                    <div class="p-d-flex p-ai-center">
+                        <button pButton label="Agregar Empleado" icon="pi pi-plus-circle" class="bg-green-500 border-green-500 text-white hover:bg-green-600 hover:border-green-600 p-button-xs p-button-outlined ml-2" (click)="new()"></button>
+                    </div>
+                </ng-template>
+                <p-table [value]="lstData" [loading]="loading" styleClass="p-datatable-gridlines"  [rowHover]="true" responsiveLayout="scroll" [scrollable]="true" class="m-1">
+                    <ng-template pTemplate="header">
+                        <tr>
+                            <th>Tipo de Doc</th>
+                            <th>Nº de documento</th>
+                            <th>Nombres</th>
+                            <th>Apellidos</th>
+                            <th>Fecha Nacimiento</th>
+                            <th>Dirección</th>
+                            <th>Ciudad</th>
+                            <th>Correo electrónico</th>
+                            <th>Teléfono</th>
+                            <th>Cargo</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </ng-template>
+                    <ng-template pTemplate="body" let-data>
+                        <tr>
+                            <td>{{data.documentType}}</td>
+                            <td>{{data.documentNumber}}</td>
+                            <td>{{data.names}}</td>
+                            <td>{{data.lastNames}}</td>
+                            <td>{{data.dateBirth | date: 'dd/MM/yyyy'}}</td>
+                            <td>{{data.address}}</td>
+                            <td>{{data.city}}</td>
+                            <td>{{data.email}}</td>
+                            <td>{{data.phone}}</td>
+                            <td>{{data.cargo}}</td>
+                            <td>
+                                <button (click)="edit(data)"
+                                pButton icon="pi pi-user-edit" pTooltip="Editar" class="text-primary-600" tooltopPosition="top"
+                                style="width: auto;background: none;border:0;padding:5px;"></button>
+                                <button (click)="delete($event,data)"
+                                pButton icon="pi pi-trash" pTooltip="Eliminar" class="text-red-500" tooltopPosition="top"
+                                style="width: auto;background: none;border:0;padding:5px;"></button>
+                                <p-confirmPopup key="deleteEmployee{{data.id}}"></p-confirmPopup>
+                            </td>
+                        </tr>
+                    </ng-template>
+                    <ng-template pTemplate="emptymessage">
+                        <tr><td colspan="10">No se encontró información</td></tr>
+                    </ng-template>
+                    <ng-template pTemplate="loadingbody">
+                        <tr><td colspan="10">Cargando información, espere porfavor</td></tr>
+                    </ng-template>
+                </p-table>
+                <p-paginator [rows]="req.limit" [totalRecords]="totalRegisters" [rowsPerPageOptions]="rowsOptions"
+                [showCurrentPageReport]="true" [first]="first" currentPageReportTemplate="Total : {totalRecords} registros" (onPageChange)="changePage($event)"></p-paginator>
+            </p-panel>
+        </div>
+        <p-dialog [header]="titleForm" [(visible)]="isDialog" [modal]="true" class="p-fluid" [style]="{width:'450px'}">
+            <ng-template pTemplate="content">
+                <form [formGroup]="formEmployee" enctype="multipart/form-data">
+                    <div class="col-12">
+                        <span class="p-float-label">
+                            <p-dropdown [(ngModel)]="employee.documentType" formControlName="documentType" [options]="documents"
+                                placeholder="Seleccione el tipo de documento"
+                                [showClear]="true"
+                            ></p-dropdown>
+                            <label for="documentType">Tipo de documento</label>
+                        </span>
+                        <small class="ng-dirty ng-invalid p-error" *ngIf="submitted && formEmployee.get('documentType')?.hasError('required')">Seleccion el tipo de documento</small>
+                    </div>
+                    <div class="col-12">
+                        <span class="p-float-label">
+                            <input [(ngModel)]="employee.documentNumber" type="text" id="documentNumber"
+                            class="p-inputtext p-component p-element" placeholder="Ingrese el número de documento" pInputText formControlName="documentNumber" required
+                            >
+                            <label for="documentNumber">Número de documento</label>
+                        </span>
+                        <small class="ng-dirty ng-invalid p-error" *ngIf="submitted && formEmployee.get('documentNumber')?.hasError('required')">Ingrese el número de documento</small>
+                    </div>
+                    <div class="col-12">
+                        <span class="p-float-label">
+                            <input [(ngModel)]="employee.names" type="text" id="names"
+                            class="p-inputtext p-component p-element" placeholder="Ingrese el nombre" pInputText formControlName="names" required
+                            >
+                            <label for="names">Nombres</label>
+                        </span>
+                        <small class="ng-dirty ng-invalid p-error" *ngIf="submitted && formEmployee.get('names')?.hasError('required')">Ingrese los nombres</small>
+                    </div>
+                    <div class="col-12">
+                        <span class="p-float-label">
+                            <input [(ngModel)]="employee.lastNames" type="text" id="lastNames"
+                            class="p-inputtext p-component p-element" placeholder="Ingrese los apellidos" pInputText formControlName="lastNames" required
+                            >
+                            <label for="lastNames">Apellidos</label>
+                        </span>
+                        <small class="ng-dirty ng-invalid p-error" *ngIf="submitted && formEmployee.get('lastNames')?.hasError('required')">Ingrese los apellidos</small>
+                    </div>
+
+                    <div class="col-12">
+                        <label for="dateBirth">Fecha de Nacimiento</label>
+                        <p-calendar id="dateBirth" formControlName="dateBirth" [showIcon]="true" inputId="icon"  appendTo="body"></p-calendar>
+                    </div>
+
+                    <div class="col-12">
+                        <span class="p-float-label">
+                            <input [(ngModel)]="employee.address" type="text" id="address"
+                            class="p-inputtext p-component p-element" placeholder="Ingrese la dirección" pInputText formControlName="address" required
+                            >
+                            <label for="address">Dirección</label>
+                        </span>
+                    </div>
+                    <div class="col-12">
+                        <span class="p-float-label">
+                            <input [(ngModel)]="employee.city" type="text" id="city"
+                            class="p-inputtext p-component p-element" placeholder="Ingrese la ciudad" pInputText formControlName="city" required
+                            >
+                            <label for="city">Ciudad</label>
+                        </span>
+                    </div>
+
+                    <div class="col-12">
+                        <span class="p-float-label">
+                            <input [(ngModel)]="employee.email" type="text" id="email"
+                            class="p-inputtext p-component p-element" placeholder="Ingrese el correo electrónico" pInputText formControlName="email" required
+                            >
+                            <label for="email">Correo electrónico</label>
+                        </span>
+                        <small class="ng-dirty ng-invalid p-error" *ngIf="submitted && formEmployee.get('email')?.hasError('email')">Ingrese un correo electronico valido</small>
+
+                    </div>
+
+                    <div class="col-12">
+                        <span class="p-float-label">
+                            <input [(ngModel)]="employee.phone" type="text" id="phone"
+                            class="p-inputtext p-component p-element" placeholder="Ingrese el teléfono" pInputText formControlName="phone" required
+                            >
+                            <label for="phone">Teléfono</label>
+                        </span>
+                    </div>
+
+                    <div class="col-12">
+                        <span class="p-float-label">
+                            <input [(ngModel)]="employee.cargo" type="text" id="cargo"
+                            class="p-inputtext p-component p-element" placeholder="Ingrese el cargo" pInputText formControlName="cargo" required
+                            >
+                            <label for="cargo">Cargo</label>
+                        </span>
+                    </div>
+
+                </form>
+            </ng-template>
+            <ng-template pTemplate="footer">
+                <button pButton pRipple label="Cancelar" icon="pi pi-times" class="p-button-text" (click)="hideDialog()"></button>
+                <button pButton pRipple label="Guardar" icon="pi pi-check" class="p-button-text" [loading]="loadingSave" (click)="save(employee)"></button>
+            </ng-template>
+        </p-dialog>
+    </div>
+</div>

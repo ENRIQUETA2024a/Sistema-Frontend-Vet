@@ -1,0 +1,161 @@
+<p-toast key="tst"></p-toast>
+<div class="grid">
+	<div class="col-12">
+		<div class="card">
+            <p-panel [collapsed]="false" class="line-height-3 m-0">
+                <ng-template pTemplate="header">
+                    <div class="text-2xl font-bold">Clientes</div>
+                </ng-template>
+                <ng-template pTemplate="icons">
+                    <div class="p-d-flex p-ai-center">
+                        <input [(ngModel)]="searchClient" id="searchClient" type="text" class="p-inputtext p-component p-element" style="width: 340px;" placeholder="Buscar por nombre, apellido o Nº de documento" pInputText>
+                        <button pButton label="Buscar" icon="pi pi-search" class="bg-blue-500 border-blue-500 text-white hover:bg-blue-600 hover:border-blue-600 p-button-xs p-button-outlined ml-2" (click)="searchClients()"></button>
+
+                        <button pButton label="Limpiar" icon="pi pi-times" class="bg-red-500 border-red-500 text-white hover:bg-red-600 hover:border-red-600 p-button-xs p-button-outlined ml-2" (click)="clearSearch()"></button>
+                        <button pButton label="Agregar cliente" icon="pi pi-plus-circle" class="bg-green-500 border-green-500 text-white hover:bg-green-600 hover:border-green-600 p-button-xs p-button-outlined ml-2" (click)="newClient()"></button>
+                    </div>
+                </ng-template>
+                <p-table [value]="lstClients" [loading]="loading" styleClass="p-datatable-gridlines"  [rowHover]="true" responsiveLayout="scroll" [scrollable]="true" class="m-1">
+                    <ng-template pTemplate="header">
+                        <tr>
+                            <th>Foto</th>
+                            <th>Nombres</th>
+                            <th>Apellidos</th>
+                            <th>Tipo de Doc</th>
+                            <th>Nº de documento</th>
+                            <th>Teléfono</th>
+                            <th>Dirección</th>
+                            <th>Ciudad</th>
+                            <th>Correo electrónico</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </ng-template>
+                    <ng-template pTemplate="body" let-data>
+                        <tr>
+                            <td>
+                                <p-image src="{{data.photo}}" alt="{{data.names}}" width="50" [preview]="true"></p-image>
+                            </td>
+                            <td>{{data.names}}</td>
+                            <td>{{data.lastnames}}</td>
+                            <td>{{data.document_type}}</td>
+                            <td>{{data.document_number}}</td>
+                            <td>{{data.phone}}</td>
+                            <td>{{data.address}}</td>
+                            <td>{{data.city}}</td>
+                            <td>{{data.email}}</td>
+                            <td>
+                                <button (click)="editClient(data)"
+                                pButton icon="pi pi-user-edit" pTooltip="Editar" class="text-primary-600" tooltopPosition="top"
+                                style="width: auto;background: none;border:0;padding:5px;"></button>
+                                <button (click)="deleteClient($event,data)"
+                                pButton icon="pi pi-trash" pTooltip="Eliminar" class="text-red-500" tooltopPosition="top"
+                                style="width: auto;background: none;border:0;padding:5px;"></button>
+                                <a [routerLink]="['/client',data.id,'patient']" pTooltip="Mascotas"
+                                class="p-element p-ripple p-button-text p-button-rounded p-button-plain p-button p-component p-button-icon-only pi pi-chevron-right"
+                                tooltopPosition="top" style="width: auto;background: none;border:0;padding:5px;height: auto;"></a>
+                                <p-confirmPopup key="deleteClient{{data.id}}"></p-confirmPopup>
+                            </td>
+                        </tr>
+                    </ng-template>
+                    <ng-template pTemplate="emptymessage">
+                        <tr><td colspan="10">No se encontró información</td></tr>
+                    </ng-template>
+                    <ng-template pTemplate="loadingbody">
+                        <tr><td colspan="10">Cargando información, espere porfavor</td></tr>
+                    </ng-template>
+                </p-table>
+                <p-paginator [rows]="req.limit" [totalRecords]="totalRecords" [rowsPerPageOptions]="rowsOptions"
+                [showCurrentPageReport]="true" [first]="first" currentPageReportTemplate="Total : {totalRecords} registros" (onPageChange)="changePage($event)"></p-paginator>
+            </p-panel>
+        </div>
+        <p-dialog [header]="titleForm" [(visible)]="isDialog" [modal]="true" class="p-fluid">
+            <ng-template pTemplate="content">
+                <form [formGroup]="formClient" enctype="multipart/form-data">
+                    <div class="col-12">
+                        <h5>Foto</h5>
+                        <input type="file" formControlName="photo" id="photo" accept="image/*" (change)="onFileChange($event)">
+                    </div>
+                    <div class="col-12">
+                        <span class="p-float-label">
+                            <input [(ngModel)]="client.names" type="text" id="names"
+                            class="p-inputtext p-component p-element" placeholder="Ingrese el nombre" pInputText formControlName="names" required
+                            >
+                            <label for="names">Nombres</label>
+                        </span>
+                        <small class="ng-dirty ng-invalid p-error" *ngIf="submitted && formClient.get('names')?.hasError('required')">Ingrese los nombres</small>
+                    </div>
+                    <div class="col-12">
+                        <span class="p-float-label">
+                            <input [(ngModel)]="client.lastnames" type="text" id="lastnames"
+                            class="p-inputtext p-component p-element" placeholder="Ingrese los apellidos" pInputText formControlName="lastnames" required
+                            >
+                            <label for="lastnames">Apellidos</label>
+                        </span>
+                        <small class="ng-dirty ng-invalid p-error" *ngIf="submitted && formClient.get('lastnames')?.hasError('required')">Ingrese los apellidos</small>
+                    </div>
+                    <div class="col-12">
+                        <span class="p-float-label">
+                            <p-dropdown [(ngModel)]="client.document_type" formControlName="document_type" [options]="documents"
+                                placeholder="Seleccione el tipo de documento"
+                                [showClear]="true"
+                            ></p-dropdown>
+                            <label for="document_type">Tipo de documento</label>
+                        </span>
+                        <small class="ng-dirty ng-invalid p-error" *ngIf="submitted && formClient.get('document_type')?.hasError('required')">Seleccion el tipo de documento</small>
+                    </div>
+                    <div class="col-12">
+                        <span class="p-float-label">
+                            <input [(ngModel)]="client.document_number" type="text" id="document_number"
+                            class="p-inputtext p-component p-element" placeholder="Ingrese el número de documento" pInputText formControlName="document_number" required
+                            >
+                            <label for="document_number">Numero de documento</label>
+                        </span>
+                        <small class="ng-dirty ng-invalid p-error" *ngIf="submitted && formClient.get('document_number')?.hasError('required')">Ingrese el numero de documento</small>
+                    </div>
+                    <div class="col-12">
+                        <span class="p-float-label">
+                            <input [(ngModel)]="client.phone" type="text" id="phone"
+                            class="p-inputtext p-component p-element" placeholder="Ingrese el teléfono" pInputText formControlName="phone" required
+                            >
+                            <label for="phone">Teléfono</label>
+                        </span>
+                    </div>
+                    <div class="col-12">
+                        <span class="p-float-label">
+                            <input [(ngModel)]="client.address" type="text" id="address"
+                            class="p-inputtext p-component p-element" placeholder="Ingrese la dirección" pInputText formControlName="address" required
+                            >
+                            <label for="address">Dirección</label>
+                        </span>
+                    </div>
+                    <div class="col-12">
+                        <span class="p-float-label">
+                            <input [(ngModel)]="client.city" type="text" id="city"
+                            class="p-inputtext p-component p-element" placeholder="Ingrese la ciudad" pInputText formControlName="city" required
+                            >
+                            <label for="city">Ciudad</label>
+                        </span>
+                    </div>
+                    <div class="col-12">
+                        <span class="p-float-label">
+                            <input [(ngModel)]="client.email" type="text" id="email"
+                            class="p-inputtext p-component p-element" placeholder="Ingrese el correo electrónico" pInputText formControlName="email" required
+                            >
+                            <label for="email">Correo electrónico</label>
+                        </span>
+                        <small class="ng-dirty ng-invalid p-error" *ngIf="submitted && formClient.get('email')?.hasError('email')">Ingrese un correo electronico valido</small>
+
+                    </div>
+                </form>
+            </ng-template>
+            <ng-template pTemplate="footer">
+                <button pButton pRipple label="Cancelar" icon="pi pi-times" class="p-button-text" (click)="hideDialog()"></button>
+                <button pButton pRipple label="Guardar" icon="pi pi-check" class="p-button-text" [loading]="loadingSave" (click)="save(client)"></button>
+            </ng-template>
+        </p-dialog>
+    </div>
+</div>
+<router-outlet></router-outlet>
+
+
+

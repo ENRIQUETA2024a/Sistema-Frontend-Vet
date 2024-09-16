@@ -1,0 +1,102 @@
+<p-toast key="tst"></p-toast>
+<div class="grid">
+	<div class="col-12">
+		<div class="card">
+            <p-panel [collapsed]="false" class="line-height-3 m-0">
+                <ng-template pTemplate="header">
+                    <div class="text-2xl font-bold">Usuarios</div>
+                </ng-template>
+                <ng-template pTemplate="icons">
+                    <div class="p-d-flex p-ai-center">
+                        <input [(ngModel)]="searchUsername" id="searchUsername" type="text" class="p-inputtext p-component p-element" placeholder="Buscar por usuario" pInputText>
+                        <button pButton label="Buscar" icon="pi pi-search" class="bg-blue-500 border-blue-500 text-white hover:bg-blue-600 hover:border-blue-600 p-button-xs p-button-outlined ml-2" (click)="searchUsers()"></button>
+                        <button pButton label="Limpiar" icon="pi pi-times" class="bg-red-500 border-red-500 text-white hover:bg-red-600 hover:border-red-600 p-button-xs p-button-outlined ml-2" (click)="clearSearch()"></button>
+                        <button pButton label="Agregar usuario" icon="pi pi-plus-circle" class="bg-green-500 border-green-500 text-white hover:bg-green-600 hover:border-green-600 p-button-xs p-button-outlined ml-2" (click)="newUser()"></button>
+                    </div>
+                </ng-template>
+
+                <p-table [value]="lstUsers" [loading]="loading" styleClass="p-datatable-gridlines"  [rowHover]="true" responsiveLayout="scroll" [scrollable]="true" class="m-1">
+                    <ng-template pTemplate="header">
+                        <tr>
+                            <th>Nombre de Usuario</th>
+                            <th>Nombre Empleado</th>
+                            <th>Rol</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </ng-template>
+                    <ng-template pTemplate="body" let-data>
+                        <tr>
+                            <td>{{data.username}}</td>
+                            <td>{{data.employee_names}}</td>
+                            <td>{{data.role_name}}</td>
+                            <td>
+                                <button (click)="editUser(data)" pButton icon="pi pi-user-edit" pTooltip="Editar" class="text-primary-600" tooltopPosition="top"
+                                style="width: auto;background: none;border: 0px;padding: 5px;"
+                                ></button>
+                                <button (click)="deleteUser($event,data)" pButton icon="pi pi-trash" pTooltip="Eliminar" class="text-red-500" tooltopPosition="top"
+                                style="width: auto;background: none;border: 0px;padding: 5px;"
+                                ></button>
+                                <p-confirmPopup key="deleteUser{{data.id}}"></p-confirmPopup>
+                            </td>
+                        </tr>
+                    </ng-template>
+                    <ng-template pTemplate="emptymessage">
+                        <tr><td colspan="2">No se encontró información</td></tr>
+                    </ng-template>
+                    <ng-template pTemplate="loadingbody">
+                        <tr><td colspan="2">Cargando información, espere porfavor</td></tr>
+                    </ng-template>
+                </p-table>
+                <p-paginator [rows]="req.limit" [totalRecords]="totalRecords" [rowsPerPageOptions]="rowsOptions"
+                [showCurrentPageReport]="true" [first]="first" currentPageReportTemplate="Total : {totalRecords} registros" (onPageChange)="changePage($event)"></p-paginator>
+            </p-panel>
+        </div>
+
+        <p-dialog [header]="titleForm" [(visible)]="isUserDialog" [modal]="true" class="p-fluid" [style]="{width:'450px'}">
+            <ng-template pTemplate="content">
+                <form [formGroup]="formUser" enctype="multipart/form-data">
+
+                        <div class="col-12">
+                            <span class="p-float-label">
+                                <p-dropdown [(ngModel)]="getEmployees.employee_id" formControlName="employee_id" [options]="lstEmployees"
+                                    placeholder="Seleccione el empleado"
+                                    [showClear]="true"
+                                ></p-dropdown>
+                                <label for="employee_id">Empleado</label>
+                            </span>
+                            <small class="ng-dirty ng-invalid p-error" *ngIf="submitted && formUser.get('employee_id')?.hasError('required')">Seleccione el empleado</small>
+                        </div>
+                        <div class="col-12">
+                            <span class="p-float-label">
+                                <p-dropdown [(ngModel)]="getRoles.role_id" formControlName="role_id" [options]="lstRoles"
+                                    placeholder="Seleccione el Rol"
+                                    [showClear]="true"
+                                ></p-dropdown>
+                                <label for="role_id">Rol</label>
+                            </span>
+                            <small class="ng-dirty ng-invalid p-error" *ngIf="submitted && formUser.get('role_id')?.hasError('required')">Seleccione el Rol</small>
+                        </div>
+                        <div class="col-12">
+                            <span class="p-float-label">
+                                <input [(ngModel)]="user.username" id="username" type="text" class="p-inputtext p-component p-element" placeholder="Ingreser el usuario" pInputText formControlName="username" required>
+                                <label for="username">Usuario</label>
+                            </span>
+                            <small class="ng-dirty ng-invalid p-error" *ngIf="submitted && formUser.get('username')?.hasError('required')">Ingrese el usuario</small>
+                        </div>
+                        <div *ngIf="!isEdit" class="col-12">
+                            <span class="p-float-label">
+                                <input [(ngModel)]="user.password" id="password" type="password" class="p-inputtext p-component p-element" placeholder="Ingreser la contraseña" pInputText formControlName="password" required>
+                                <label for="password">Contraseña</label>
+                            </span>
+                            <small class="ng-dirty ng-invalid p-error" *ngIf="submitted && formUser.get('password')?.hasError('required')">Ingrese la contraseña</small>
+                        </div>
+
+                </form>
+            </ng-template>
+            <ng-template pTemplate="footer">
+                <button pButton pRipple label="Cancelar" icon="pi pi-times" class="p-button-text" (click)="hideDialog()"></button>
+                <button pButton pRipple label="Guardar" icon="pi pi-check" class="p-button-text" [loading]="loadingSave" (click)="saveUser(user)"></button>
+            </ng-template>
+        </p-dialog>
+    </div>
+</div>

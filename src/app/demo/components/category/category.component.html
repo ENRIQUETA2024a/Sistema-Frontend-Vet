@@ -1,0 +1,62 @@
+<p-toast key="tst"></p-toast>
+<div class="grid">
+	<div class="col-12">
+		<div class="card">
+            <p-panel header="Categorias" [collapsed]="false" class="line-height-3 m-0">
+                <ng-template pTemplate="icons">
+                    <button pButton label="Agregar categoria" icon="pi pi-plus-circle" class="bg-green-500 border-green-500 text-white hover:bg-green-600 hover:border-green-600 p-button-xs p-button-outlined mr-2" (click)="new()"></button>
+                </ng-template>
+                <p-table [value]="lstData" [loading]="loading" styleClass="p-datatable-gridlines"  [rowHover]="true" responsiveLayout="scroll" [scrollable]="true" class="m-1">
+                    <ng-template pTemplate="header">
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </ng-template>
+                    <ng-template pTemplate="body" let-data>
+                        <tr>
+                            <td>{{data.name}}</td>
+                            <td>
+                                <button (click)="edit(data)"
+                                pButton icon="pi pi-user-edit" pTooltip="Editar" class="text-primary-600" tooltopPosition="top"
+                                style="width: auto;background: none;border:0;padding:5px;"></button>
+                                <button (click)="delete($event,data)"
+                                pButton icon="pi pi-trash" pTooltip="Eliminar" class="text-red-500" tooltopPosition="top"
+                                style="width: auto;background: none;border:0;padding:5px;"></button>
+                                <p-confirmPopup key="deleteCategory{{data.id}}"></p-confirmPopup>
+                            </td>
+                        </tr>
+                    </ng-template>
+                    <ng-template pTemplate="emptymessage">
+                        <tr><td colspan="3">No se encontró información</td></tr>
+                    </ng-template>
+                    <ng-template pTemplate="loadingbody">
+                        <tr><td colspan="3">Cargando información, espere porfavor</td></tr>
+                    </ng-template>
+                </p-table>
+                <p-paginator [rows]="req.limit" [totalRecords]="totalRecords" [rowsPerPageOptions]="rowsOptions"
+                [showCurrentPageReport]="true" [first]="first" currentPageReportTemplate="Total : {totalRecords} registros" (onPageChange)="changePage($event)"></p-paginator>
+            </p-panel>
+        </div>
+        <p-dialog [header]="titleForm" [(visible)]="isDialog" [modal]="true" class="p-fluid" [style]="{width:'450px'}">
+            <ng-template pTemplate="content">
+                <form [formGroup]="formCategory" enctype="multipart/form-data">
+                    <div class="col-12">
+                        <span class="p-float-label">
+                            <input [(ngModel)]="category.name" type="text" id="name"
+                            class="p-inputtext p-component p-element" placeholder="Ingrese el nombre" pInputText formControlName="name" required
+                            >
+                            <label for="names">Nombre</label>
+                        </span>
+                        <small class="ng-dirty ng-invalid p-error" *ngIf="submitted && formCategory.get('name')?.hasError('required')">Ingrese el nombre de la categoria</small>
+                    </div>
+                </form>
+            </ng-template>
+            <ng-template pTemplate="footer">
+                <button pButton pRipple label="Cancelar" icon="pi pi-times" class="p-button-text" (click)="hideDialog()"></button>
+                <button pButton pRipple label="Guardar" icon="pi pi-check" class="p-button-text" [loading]="loadingSave" (click)="save(category)"></button>
+            </ng-template>
+        </p-dialog>
+    </div>
+</div>
+

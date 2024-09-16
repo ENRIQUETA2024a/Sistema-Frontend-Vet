@@ -1,0 +1,159 @@
+<p-toast key="tst"></p-toast>
+<div class="grid">
+	<div class="col-12">
+		<div class="card">
+            <p-panel header="Pacientes" [collapsed]="false" class="line-height-3 m-0">
+                <ng-template pTemplate="icons">
+                    <button pButton label="Agregar paciente" icon="pi pi-plus-circle" class="bg-green-500 border-green-500 text-white hover:bg-green-600 hover:border-green-600 p-button-xs p-button-outlined mr-2" (click)="new()"></button>
+                </ng-template>
+                <p-table [value]="lstData" [loading]="loading" styleClass="p-datatable-gridlines"  [rowHover]="true" responsiveLayout="scroll" [scrollable]="true" class="m-1">
+                    <ng-template pTemplate="header">
+                        <tr>
+                            <th>Foto</th>
+                            <th>Nombres</th>
+                            <th>Fecha Nacimiento</th>
+                            <th>Edad</th>
+                            <th>Sexo</th>
+                            <th>Color</th>
+                            <th>Pelaje</th>
+                            <th>Particularidad</th>
+                            <th>Alergia</th>
+                            <th>Raza</th>
+                            <th>Cliente</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </ng-template>
+                    <ng-template pTemplate="body" let-data>
+                        <tr>
+                            <td>
+                                <p-image src="{{data.photo}}" alt="{{data.names}}" width="50" [preview]="true"></p-image>
+                            </td>
+                            <td>{{data.names}}</td>
+                            <td>{{data.birthday | date: 'dd/MM/yyyy'}}</td>
+                            <td>{{data.age}}</td>
+                            <td>{{data.sex}}</td>
+                            <td>{{data.color}}</td>
+                            <td>{{data.fur}}</td>
+                            <td>{{data.particularity}}</td>
+                            <td>{{data.allergy}}</td>
+                            <td>{{data.breed}}</td>
+                            <td>{{data.client}}</td>
+                            <td>
+                                <button (click)="edit(data)"
+                                pButton icon="pi pi-user-edit" pTooltip="Editar" class="text-primary-600" tooltopPosition="top"
+                                style="width: auto;background: none;border:0;padding:5px;"></button>
+                                <button (click)="delete($event,data)"
+                                pButton icon="pi pi-trash" pTooltip="Eliminar" class="text-red-500" tooltopPosition="top"
+                                style="width: auto;background: none;border:0;padding:5px;"></button>
+                                <a [routerLink]="['/patient',data.id,'consults']" pTooltip="Consultas"
+                                class="p-element p-ripple p-button-text p-button-rounded p-button-plain p-button p-component p-button-icon-only pi pi-chevron-right"
+                                tooltopPosition="top" style="width: auto;background: none;border:0;padding:5px;height: auto;"></a>
+                                <a [routerLink]="['/patient',data.id,'recetas']" pTooltip="Recetas"
+                                class="p-element p-ripple p-button-text p-button-rounded p-button-plain p-button p-component p-button-icon-only pi pi-file"
+                                tooltopPosition="top" style="width: auto;background: none;border:0;padding:5px;height: auto;"></a>
+                                <p-confirmPopup key="deletePatient{{data.id}}"></p-confirmPopup>
+                            </td>
+                        </tr>
+                    </ng-template>
+                    <ng-template pTemplate="emptymessage">
+                        <tr><td colspan="12">No se encontró información</td></tr>
+                    </ng-template>
+                    <ng-template pTemplate="loadingbody">
+                        <tr><td colspan="12">Cargando información, espere porfavor</td></tr>
+                    </ng-template>
+                </p-table>
+                <p-paginator [rows]="req.limit" [totalRecords]="totalRecords" [rowsPerPageOptions]="rowsOptions"
+                [showCurrentPageReport]="true" [first]="first" currentPageReportTemplate="Total : {totalRecords} registros" (onPageChange)="changePage($event)"></p-paginator>
+            </p-panel>
+        </div>
+        <p-dialog [header]="titleForm" [(visible)]="isPatientDialog" [modal]="true" class="p-fluid" [style]="{width:'450px'}">
+            <ng-template pTemplate="content">
+                <form [formGroup]="formPatient" enctype="multipart/form-data">
+                    <div class="col-12">
+                        <h5>Foto</h5>
+                        <input type="file"  id="photo" accept="image/*" (change)="onFileChange($event)">
+                    </div>
+                    <div class="col-12">
+                        <span class="p-float-label">
+                            <p-dropdown [(ngModel)]="patient.breed_id" formControlName="breed_id" [options]="lstBreeds"
+                                placeholder="Seleccione la raza"
+                                [showClear]="true"
+                            ></p-dropdown>
+                            <label for="breed_id">Raza</label>
+                        </span>
+                        <small class="ng-dirty ng-invalid p-error" *ngIf="submitted && formClient.get('breed_id')?.hasError('required')">Seleccion la raza</small>
+                    </div>
+                    <div class="col-12">
+                        <span class="p-float-label">
+                            <input [(ngModel)]="patient.names" type="text" id="names"
+                            class="p-inputtext p-component p-element" placeholder="Ingrese el nombre" pInputText formControlName="names" required
+                            >
+                            <label for="names">Nombres</label>
+                        </span>
+                        <small class="ng-dirty ng-invalid p-error" *ngIf="submitted && formPatient.get('names')?.hasError('required')">Ingrese los nombres</small>
+                    </div>
+                    <div class="col-12">
+                        <span class="p-float-label">
+                            <p-calendar [(ngModel)]="patient.birthday" id="birthday" formControlName="birthday" [showIcon]="true" inputId="icon"  appendTo="body"></p-calendar>
+                            <label for="birthday">Fecha de nacimiento</label>
+                        </span>
+                    </div>
+                    <div class="col-12">
+                        <span class="p-float-label">
+                            <input [(ngModel)]="patient.age" type="text" id="age"
+                            class="p-inputtext p-component p-element" placeholder="Ingrese la edad" pInputText formControlName="age"
+                            >
+                            <label for="age">Edad</label>
+                        </span>
+                    </div>
+                    <div class="col-12">
+                        <span class="p-float-label">
+                            <p-dropdown [(ngModel)]="patient.sex" formControlName="sex" [options]="sexData"
+                                placeholder="Seleccione el sexo"
+                                [showClear]="true"
+                            ></p-dropdown>
+                            <label for="sex">Sexo</label>
+                        </span>
+                        <small class="ng-dirty ng-invalid p-error" *ngIf="submitted && formClient.get('sex')?.hasError('required')">Seleccion el sexo</small>
+                    </div>
+                    <div class="col-12">
+                        <span class="p-float-label">
+                            <input [(ngModel)]="patient.color" type="text" id="color"
+                            class="p-inputtext p-component p-element" placeholder="Ingrese el color" pInputText formControlName="color"
+                            >
+                            <label for="color">Color</label>
+                        </span>
+                    </div>
+                    <div class="col-12">
+                        <span class="p-float-label">
+                            <input [(ngModel)]="patient.fur" type="text" id="fur"
+                            class="p-inputtext p-component p-element" placeholder="Ingrese el pelaje" pInputText formControlName="fur" required
+                            >
+                            <label for="fur">Pelaje</label>
+                        </span>
+                    </div>
+                    <div class="col-12">
+                        <span class="p-float-label">
+                            <textarea class="p-inputtext p-component p-element" [(ngModel)]="patient.particularity" id="particularity" rows="5" cols="30" formControlName="particularity"
+                            placeholder="Ingrese la particularidad"></textarea>
+                            <label for="particularity">Particularidad</label>
+                        </span>
+                    </div>
+                    <div class="col-12">
+                        <span class="p-float-label">
+                            <textarea class="p-inputtext p-component p-element" [(ngModel)]="patient.allergy" id="allergy" rows="5" cols="30" formControlName="allergy"
+                            placeholder="Ingrese la alergia"></textarea>
+                            <label for="allergy">Alergia</label>
+                        </span>
+                    </div>
+                </form>
+            </ng-template>
+            <ng-template pTemplate="footer">
+                <button pButton pRipple label="Cancelar" icon="pi pi-times" class="p-button-text" (click)="hideDialog()"></button>
+                <button pButton pRipple label="Guardar" icon="pi pi-check" class="p-button-text" [loading]="loadingSave" (click)="save(patient)"></button>
+            </ng-template>
+        </p-dialog>
+    </div>
+</div>
+<router-outlet></router-outlet>
+

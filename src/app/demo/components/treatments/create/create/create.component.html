@@ -1,0 +1,70 @@
+<p-toast key="tst"></p-toast>
+<div class="grid">
+    <div class="col-12">
+        <div class="card">
+            <form [formGroup]="formProducts">
+                <p-panel header="Detalle" [collapsed]="false" class="line-height-3 m-0">
+                    <ng-template pTemplate="content">
+                            <div class="col-12">
+                                <label for="detail"></label>
+                                <textarea
+                                    class="p-inputtext p-component p-element col-12"
+                                    id="detail"
+                                    rows="10"
+                                    formControlName="detail"
+                                    placeholder="Ingrese el detalle del tratamiento"
+                                    required
+                                ></textarea>
+                                <small class="ng-dirty ng-invalid p-error" *ngIf="submitted && formProducts.get('detail')?.hasError('required')">Ingrese el detalle del tratamiento</small>
+
+                            </div>
+                        </ng-template>
+                    </p-panel>
+                    <p-panel header="Productos" [collapsed]="false" class="m-5">
+                        <div class="col-12 flex align-items-center">
+                            <div class="col-10">
+                                <p-dropdown  formControlName="products"
+                                placeholder="Seleccione el producto"
+                                [showClear]="true"
+                                [options]="lstProductos"
+                                optionValue="product_id"
+                                >
+                                </p-dropdown>
+                            </div>
+                            <div class="col-2">
+                                <button pButton pRipple icon="pi pi-plus" (click)="addProduct()"></button>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <p-table [value]="selectedProducts" styleClass="p-datatable-gridlines"  [rowHover]="true" responsiveLayout="scroll" [scrollable]="true" class="m-1">
+                                <ng-template pTemplate="header">
+                                    <tr>
+                                        <th>Producto</th>
+                                        <th>Accion</th>
+                                    </tr>
+                                </ng-template>
+                                <ng-template pTemplate="body" let-data>
+                                    <tr>
+                                        <td>{{data.label}}</td>
+                                        <td>
+                                            <button (click)="delete($event,data)"
+                                            pButton icon="pi pi-trash" pTooltip="Eliminar" class="text-red-500" tooltopPosition="top"
+                                            style="width: auto;background: none;border:0;padding:5px;"></button>
+                                            <p-confirmPopup key="deleteCreateProductTratamiento{{data.product_id}}"></p-confirmPopup>
+                                        </td>
+                                    </tr>
+                                </ng-template>
+
+                            </p-table>
+                        </div>
+                </p-panel>
+            </form>
+            <div class="col-12 flex justify-content-center gap-2">
+                <a [routerLink]="['/diagnosis',id,'treatments']" pButton  label="Cancelar" class="pi pi-times text-white flex gap-2 align-items-center"></a>
+                <button pButton pRipple label="Guardar" icon="pi pi-check" class="p-button " [loading]="loadingSave" (click)="save()"></button>
+            </div>
+        </div>
+    </div>
+</div>
+<router-outlet></router-outlet>
+

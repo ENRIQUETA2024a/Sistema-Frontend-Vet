@@ -1,0 +1,30 @@
+<div class="layout-topbar">
+    <a class="layout-topbar-logo" routerLink="">
+        <img src="assets/demo/images/login/logo_zoolomascotas.png" alt="logo" style="width: 160px; height: auto;">
+
+    </a>
+
+    <button #menubutton class="p-link layout-menu-button layout-topbar-button" (click)="layoutService.onMenuToggle()">
+        <i class="pi pi-bars"></i>
+    </button>
+
+    <button #topbarmenubutton class="p-link layout-topbar-menu-button layout-topbar-button" (click)="layoutService.showProfileSidebar()">
+        <i class="pi pi-ellipsis-v"></i>
+    </button>
+
+    <div #topbarmenu class="layout-topbar-menu" [ngClass]="{'layout-topbar-menu-mobile-active': layoutService.state.profileSidebarVisible}">
+         <p class="p-link m-3">Bienvenido {{ username }}</p>
+        <button class="p-link layout-topbar-button">
+            <i class="pi pi-calendar"></i>
+            <span>Calendar</span>
+        </button>
+        <button class="p-link layout-topbar-button">
+            <i class="pi pi-user"></i>
+            <span>Profile</span>
+        </button>
+        <button (click)="logout()" class="p-link layout-topbar-button bg-red-500 text-white hover:bg-red-600 text-sm py-2 px-4 rounded"    >
+            <i class="pi pi-fw pi-power-off"></i>
+            <span>Salir</span>
+        </button>
+    </div>
+</div>

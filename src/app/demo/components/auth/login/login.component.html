@@ -1,0 +1,23 @@
+<div class="surface-ground flex align-items-center justify-content-center min-h-screen min-w-screen overflow-hidden"
+     style="background-image: url('https://res.cloudinary.com/dwpjvql78/image/upload/v1713416373/PhotoReal_cachorros_en_una_veterinaria_1_1_hy1vdu.jpg'); background-size: cover; background-position: center;">
+    <div class="flex flex-column align-items-center justify-content-center">
+        <div style="border-radius:56px; padding:0.3rem; background: linear-gradient(180deg, #28a745 10%, rgba(40, 167, 69, 0) 30%);">
+            <div class="w-full surface-card py-8 px-5 sm:px-8" style="border-radius:53px">
+                <div class="text-center mb-5">
+                    <img src="assets/demo/images/login/logo_zoolomascotas.png" alt="Image" height="100" class="mx-auto mb-3">
+                    <span class="text-2xl font-bold block text-center">Iniciar sesión para continuar</span>
+                </div>
+                <div>
+                    <label for="username" class="block text-900 text-xl font-medium mb-2">Usuario</label>
+                    <input id="username" [(ngModel)]="username" type="text" placeholder="Ingresa tu usuario" pInputText class="w-full md:w-30rem mb-5" style="padding:1rem">
+                    <label for="password" class="block text-900 font-medium text-xl mb-2">Contraseña</label>
+                    <p-password id="password" [(ngModel)]="password" placeholder="Contraseña" [toggleMask]="true" styleClass="mb-5" inputStyleClass="w-full p-3 md:w-30rem"></p-password>
+                    <div class="flex align-items-center justify-content-between mb-5 gap-5">
+                        <div class="flex align-items-center"></div>
+                    </div><br>
+                    <button pButton pRipple label="Iniciar sesión" class="w-full p-3 text-xl bg-green-500 text-white hover:bg-green-600" (click)="login()"></button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
